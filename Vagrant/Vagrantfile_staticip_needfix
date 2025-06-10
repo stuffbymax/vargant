@@ -1,0 +1,18 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+    config.vm.network "public_network", ip: "10.1.0.65"
+    #use_dhcp_assigned_default_route: true
+  config.vm.synced_folder "./shared/", "/shared"
+  config.vm.provision "shell",privileged: false, inline: <<-SHELL
+  sudo apt update
+  sudo apt upgrade
+  sudo apt install -y nginx lynx vim git wget unzip
+  cd /var/www/html/
+  sudo mv /shared/10.1.0.65/ /var/www/html/
+  sudo mv /shared/10.1.0.65.txt /etc/nginx/sites-available/10.1.0.65
+sudo ln -sf /etc/nginx/sites-available/10.1.0.65 /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+  SHELL
+end
