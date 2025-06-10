@@ -1,0 +1,141 @@
+/* --- Google Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
+
+/* --- General & Body Styles --- */
+:root {
+  --nasa-blue: #0b3d91;
+  --nasa-red: #FC3D21;
+  --primary-bg: #10101a; /* A very dark blue, like deep space */
+  --primary-text: #f0f0f0;
+  --secondary-text: #cccccc;
+  --border-color: #555;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* --- Main Content Wrapper --- */
+.viewer-container {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Header --- */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-text);
+  letter-spacing: 2px;
+  text-align: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--nasa-red);
+  margin-bottom: 1rem;
+}
+
+/* --- Photo Container --- */
+#photo {
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px; /* Ensures space is reserved before image loads */
+  background-color: #000;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+#photo img {
+  max-width: 100%;
+  max-height: 70vh;
+  display: block;
+  object-fit: contain;
+}
+
+/* --- Photo Info Message --- */
+#message {
+  font-size: 1rem;
+  color: var(--secondary-text);
+  font-style: italic;
+  text-align: center;
+  min-height: 1.2em; /* Prevents layout shift */
+}
+
+/* --- Navigation Buttons --- */
+.nav-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  font-family: 'Exo 2', sans-serif;
+  background: transparent;
+  color: var(--primary-text);
+  border: 2px solid var(--nasa-red);
+  padding: 10px 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover, button:focus {
+  background-color: var(--nasa-red);
+  color: #fff;
+  outline: none;
+  box-shadow: 0 0 10px var(--nasa-red);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* --- Responsive Design for Smaller Screens --- */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  .viewer-container {
+    padding: 1rem;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  #photo {
+    min-height: 250px;
+  }
+  .nav-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  button {
+    width: 100%;
+  }
+}
