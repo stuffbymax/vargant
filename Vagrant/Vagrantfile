@@ -22,7 +22,7 @@ server {
         root /var/www/10.1.0.65/;
         index index.html index.htm index.nginx-debian.html;
 
-        server_name your_domain www.your_domain;
+        server_name 10.1.0.65 www.10.1.0.65;
 
         location / {
                 try_files \$uri \$uri/ =404;
