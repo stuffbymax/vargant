@@ -10,10 +10,7 @@ Vagrant.configure("2") do |config|
   sudo apt upgrade
   sudo apt install -y nginx lynx vim git wget unzip
   wget https://github.com/stuffbymax/vargant/archive/refs/heads/main.zip
-  unzip main.zip
-  cd vargant-main
-  cd Vagrant/
-  cp 10.1.0.65/ /var/www/
+  cp vargant-main/Vagrant/10.1.0.65/ /var/www/html/
   cd /etc/nginx/sites-available/
   sudo tee /etc/nginx/sites-available/10.1.0.65 > /dev/null <<EOF
 server {
