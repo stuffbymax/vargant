@@ -1,86 +1,16 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# --- User Prompt Logic ---
-provision_method = ""
-while provision_method.empty?
-  puts "--------------------------------------------------"
-  puts "Choose a provisioning method for the web content:"
-  puts "  [1] Use local './shared' folder (for development)"
-  puts "  [2] Clone from GitHub (for initial setup)"
-  puts "--------------------------------------------------"
-  print "Enter your choice (default is 1): "
-  choice = STDIN.gets.chomp
-
-  if choice == "2"
-    provision_method = "git"
-    puts "--> You chose: Clone from GitHub"
-  elsif choice == "1" || choice.empty?
-    provision_method = "local"
-    puts "--> You chose: Use local './shared' folder"
-  else
-    puts "\nInvalid choice. Please enter 1 or 2."
-  end
-end
-# --- End of User Prompt Logic ---
-
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/jammy64"
-  config.vm.network "public_network",
-    use_dhcp_assigned_default_route: true
-
-  # This syncs your local './shared' folder to '/shared' inside the VM.
-  config.vm.synced_folder "./shared/", "/shared", create: true
-
-  config.vm.provision "shell", privileged: false, env: {
-      "PROVISION_METHOD" => provision_method
-    }, inline: <<-SHELL
-
-    # --- 1. System Setup ---
-    echo "Updating and installing base packages..."
-    sudo apt-get update
-    sudo apt-get install -y nginx lynx vim git
-
-    # --- 2. Content Setup based on User Choice ---
-    if [ "$PROVISION_METHOD" = "git" ]; then
-      # --- METHOD 2: Clone from Git ---
-      echo "Cloning from Git repository..."
-      cd /tmp
-      rm -rf vargant
-      git clone https://github.com/stuffbymax/vargant.git
-
-      # Copy web files from the cloned repo to the web root
-      sudo cp -r /tmp/vargant/Vagrant/10.1.0.65/* /var/www/html/
-
-      # Copy the Nginx config file from the cloned repo
-      sudo cp /tmp/vargant/Vagrant/10.1.0.65.txt /etc/nginx/sites-available/10.1.0.65
-
-    else
-      # --- METHOD 1: Use local shared folder ---
-      # This block is now tailored to your exact file structure.
-      echo "Copying local files from your /shared folder..."
-
-      # Check for required files/directories to prevent errors
-      if [ ! -d "/shared/10.1.0.65" ] || [ ! -f "/shared/10.1.0.65.txt" ]; then
-        echo "ERROR: You chose to use the local folder, but the required files are missing."
-        echo "Please ensure './shared/10.1.0.65/' and './shared/10.1.0.65.txt' exist."
-        exit 1
-      fi
-
-      # Copy your website files from /shared/10.1.0.65/ to the Nginx web root
-      sudo cp -r /shared/10.1.0.65/* /var/www/html/
-
-      # Copy your Nginx config file and rename it correctly for Nginx
-      sudo cp /shared/10.1.0.65.txt /etc/nginx/sites-available/10.1.0.65
-    fi
-
-    # --- 3. Nginx Configuration (Common Steps) ---
-    echo "Configuring Nginx..."
-    sudo rm -f /etc/nginx/sites-enabled/default
-    sudo ln -sf /etc/nginx/sites-available/10.1.0.65 /etc/nginx/sites-enabled/
-    sudo nginx -t
-    sudo systemctl restart nginx
-
-    echo "Provisioning complete! The VM is ready."
-  SHELL
+config.vm.box = "ubuntu/jammy64"
+config.vm.network "public_network",
+use_dhcp_assigned_default_route: true
+config.vm.synced_folder "./shared/", "/shared"
+config.vm.provision "shell",privileged: false, inline: <<-SHELL
+sudo apt update
+sudo apt upgrade
+sudo apt install -y nginx lynx vim git wget unzip
+cd /var/www/html/
+sudo mv /shared/10.1.0.65/ /var/www/html/
+sudo mv /shared/10.1.0.65.txt /etc/nginx/sites-available/10.1.0.65
+sudo ln -sf /etc/nginx/sites-available/10.1.0.65 /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+SHELL
 end
