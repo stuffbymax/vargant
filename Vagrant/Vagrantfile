@@ -1,3 +1,4 @@
+# curently the Vagrant doesnt update the ngix config automaticaly you have to update it your self 
 Vagrant.configure("2") do |config|
 config.vm.box = "ubuntu/jammy64"
 config.vm.network "public_network",
