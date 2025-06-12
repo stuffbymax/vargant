@@ -8,9 +8,11 @@ sudo apt update
 sudo apt upgrade
 sudo apt install -y nginx lynx vim git wget unzip
 cd /var/www/html/
-sudo mv /shared/10.1.0.65/ /var/www/html/
-sudo mv /shared/10.1.0.65.txt /etc/nginx/sites-available/10.1.0.65
-sudo ln -sf /etc/nginx/sites-available/10.1.0.65 /etc/nginx/sites-enabled/
+sudo mv /shared/nasa/ /var/www/html/
+sudo mv /shared/nasa.txt /etc/nginx/sites-available/10.1.0.75
+sudo chown -R $USER:$USER /var/www/10.1.0.75/html
+sudo chmod -R 755 /var/www/10.1.0.75
+sudo ln -sf /etc/nginx/sites-available/10.1.0.75 /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 SHELL
 end
