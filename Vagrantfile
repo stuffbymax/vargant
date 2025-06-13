@@ -1,0 +1,20 @@
+Vagrant.configure("2") do |config|
+config.vm.box = "ubuntu/jammy64"
+config.vm.network "public_network",
+use_dhcp_assigned_default_route: true
+config.vm.synced_folder "./shared/", "/shared"
+config.vm.provision "shell",privileged: false, inline: <<-SHELL
+sudo apt update
+sudo apt upgrade
+sudo apt install -y nginx lynx vim git wget unzip dh-make devscripts
+cd /var/www/html/
+sudo mv /shared/nasa/ /var/www/html/
+sudo mv /shared/nasa.txt /etc/nginx/sites-available/10.1.0.75
+sudo chown -R $USER:$USER /var/www/10.1.0.75/html
+sudo chmod -R 755 /var/www/10.1.0.75
+sudo ln -sf /etc/nginx/sites-available/10.1.0.75 /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+git clone https://github.com/stuffbymax/Bash-Theft-Auto.git
+
+SHELL
+end
