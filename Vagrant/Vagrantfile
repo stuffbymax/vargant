@@ -1,5 +1,6 @@
 # curently the Vagrant doesnt update the ngix config automaticaly you have to update it your self 
 # also this is private ip 
+# dh-make devscripts for making deb pkg via sh
 
 Vagrant.configure("2") do |config|
 config.vm.box = "ubuntu/jammy64"
