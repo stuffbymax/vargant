@@ -13,29 +13,35 @@ Vagrant.configure("2") do |config|
     # Update package lists and upgrade installed packages
     sudo apt update
     sudo apt upgrade -y
-    
-    # Install necessary packages: nginx (web server), lynx (text-based browser), vim (editor),
-    # git (version control), wget (file downloader), unzip (archive tool),
-    # dh-make and devscripts (for Debian packaging tools)
+
+    # Install necessary packages
     sudo apt install -y nginx lynx vim git wget unzip dh-make devscripts
 
-    # Find the first IPv4 address on the VM that matches private IP ranges (10.1.x.x or 192.168.x.x)
+    # Find the first private IPv4 address (10.1.x.x or 192.168.x.x)
     IPADDR=$(ip -4 a | grep inet | awk '{print $2}' | cut -d "/" -f 1 | grep -E "10\\.1\\.|192\\.168\\." | head -n 1)
 
-    # Create a directory for the website files using the IP address as folder name
+    # If no suitable IP address was found, print error and exit
+    if [ -z "$IPADDR" ]; then
+      echo "No suitable IP found!"
+      exit 1
+    fi
+
+    # Print the selected IP address
+    echo -e "Your IP is \\e[42m$IPADDR\\e[0m"
+
+    # Create a directory for the website files
     sudo mkdir -p /var/www/$IPADDR/html
-    
-    # Copy all contents from the shared folder's "nasa" directory to the web root directory
+
+    # Copy website files from the shared "nasa" directory
     sudo cp -r /shared/nasa/* /var/www/$IPADDR/html/
 
-    # Create an nginx site configuration file using a "here document"
-    # Configure nginx to serve the website from /var/www/$IPADDR/html
-sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<EOF
+    # Create an Nginx site configuration
+    sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<EOF
 server {
     listen 80;
     listen [::]:80;
 
-    root $TARGET_DIR;
+    root /var/www/$IPADDR/html;
     index index.html index.htm index.nginx-debian.html;
 
     server_name $IPADDR www.$IPADDR;
@@ -46,26 +52,14 @@ server {
 }
 EOF
 
-
-    # Change ownership of the web root files to the vagrant user and group
+    # Set ownership and permissions
     sudo chown -R vagrant:vagrant /var/www/$IPADDR/html
-
-    # Set permissions for the web root directory and its contents
     sudo chmod -R 755 /var/www/$IPADDR
 
-    # Enable the new nginx site by creating a symlink in sites-enabled
+    # Enable the Nginx site
     sudo ln -sf /etc/nginx/sites-available/$IPADDR /etc/nginx/sites-enabled/
 
-    # If no suitable IP address was found, print error and exit the script
-    if [ -z "$IPADDR" ]; then
-      echo "No suitable IP found!"
-      exit 1
-    fi
-
-    # Print the selected IP address to the console
-    echo "Your IP is \e[42m$IPADDR\e[49m"
-
-    # Restart nginx to apply the new configuration
+    # Restart Nginx to apply changes
     sudo systemctl restart nginx
   SHELL
 end
