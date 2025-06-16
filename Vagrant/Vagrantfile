@@ -30,24 +30,21 @@ Vagrant.configure("2") do |config|
 
     # Create an nginx site configuration file using a "here document"
     # Configure nginx to serve the website from /var/www/$IPADDR/html
-    sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<'EOF'
+sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<EOF
 server {
     listen 80;
     listen [::]:80;
 
-    # Set root directory for the site
-    root /var/www/$IPADDR/html;
-    
-    # Default index files nginx will look for
+    root $TARGET_DIR;
     index index.html index.htm index.nginx-debian.html;
 
-    # Set server names for this site to the IP and www.IP
     server_name $IPADDR www.$IPADDR;
 
     location / {
-        # Try to serve the requested URI or show a 404 if not found
         try_files \$uri \$uri/ =404;
     }
+}
+EOF
 }
 EOF
 
