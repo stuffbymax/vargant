@@ -1,35 +1,48 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
-  config.vm.network "public_network",
-    use_dhcp_assigned_default_route: true
+
+  config.vm.network "public_network", use_dhcp_assigned_default_route: true
+
   config.vm.synced_folder "./shared/", "/shared"
-  config.vm.provision "shell",privileged: false, inline: <<-SHELL
-  sudo apt update
-  sudo apt upgrade
-  sudo apt install -y nginx lynx vim git wget unzip
-  cd /var/www/html/
-  sudo wget https://github.com/stuffbymax/vargant/archive/refs/heads/main.zip
-  sudo unzip main.zip
-  sudo mv vargant-main/Vagrant/10.1.0.65/ /var/www/html/
-  cd /etc/nginx/sites-available/
-  sudo tee /etc/nginx/sites-available/10.1.0.65 > /dev/null <<EOF
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo apt update
+    sudo apt upgrade -y
+    sudo apt install -y nginx lynx vim git wget unzip dh-make devscripts
+
+    # Get IP address
+    IPADDR=$(ip -4 a | grep inet | awk '{print $2}' | cut -d "/" -f 1 | grep -E "10\\.1\\.|192\\.168\\.")
+    echo "Your IP is $IPADDR"
+
+    # Copy website files
+    sudo cp -r /shared/nasa/ /var/www/html/
+
+    # Create nginx config
+    sudo tee /etc/nginx/sites-available/nasa > /dev/null <<EOF
 server {
-        listen 80;
-        listen [::]:80;
+    listen 80;
+    listen [::]:80;
 
-        root /var/www/10.1.0.65/;
-        index index.html index.htm index.nginx-debian.html;
+    root /var/www/html/nasa;
+    index index.html index.htm index.nginx-debian.html;
 
-        server_name 10.1.0.65 www.10.1.0.65;
+    server_name $IPADDR www.$IPADDR;
 
-        location / {
-                try_files \$uri \$uri/ =404;
-        }
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
 }
 EOF
-sudo ln -sf /etc/nginx/sites-available/10.1.0.65 /etc/nginx/sites-enabled/
-sudo systemctl restart nginx
+
+    # Set permissions
+    sudo chown -R $USER:$USER /var/www/html/nasa
+    sudo chmod -R 755 /var/www/html
+
+    # Enable nginx site
+    sudo ln -sf /etc/nginx/sites-available/nasa /etc/nginx/sites-enabled/
+    sudo systemctl restart nginx
+
+    # Clone GitHub repo (personal project)
+    #git clone https://github.com/stuffbymax/Bash-Theft-Auto.git
   SHELL
 end
