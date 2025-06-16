@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
     echo "Your IP is $IPADDR"
 
     # Copy website files
-    sudo cp -r /shared/nasa/ /var/www/html/
+    sudo cp -r /shared/nasa/ /var/www/
 
     # Create nginx config
     sudo tee /etc/nginx/sites-available/nasa > /dev/null <<EOF
@@ -23,7 +23,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    root /var/www/html/nasa;
+    root /var/www/nasa;
     index index.html index.htm index.nginx-debian.html;
 
     server_name $IPADDR www.$IPADDR;
@@ -35,14 +35,14 @@ server {
 EOF
 
     # Set permissions
-    sudo chown -R $USER:$USER /var/www/html/nasa
-    sudo chmod -R 755 /var/www/html
+    sudo chown -R $USER:$USER /var/www/nasa
+    sudo chmod -R 755 /var/www/
 
     # Enable nginx site
     sudo ln -sf /etc/nginx/sites-available/nasa /etc/nginx/sites-enabled/
     sudo systemctl restart nginx
 
-    # Clone GitHub repo (personal project)
+    # Clone GitHub repo (personal project) for making deb pkg
     #git clone https://github.com/stuffbymax/Bash-Theft-Auto.git
   SHELL
 end
