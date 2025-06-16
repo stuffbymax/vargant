@@ -45,10 +45,7 @@ server {
     }
 }
 EOF
-}
-EOF
-}
-EOF
+
 
     # Change ownership of the web root files to the vagrant user and group
     sudo chown -R vagrant:vagrant /var/www/$IPADDR/html
