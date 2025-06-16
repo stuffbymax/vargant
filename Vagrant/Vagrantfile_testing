@@ -38,12 +38,11 @@ Vagrant.configure("2") do |config|
     sudo cp -r /shared/nasa/* $TARGET_DIR/
 
     # Create an Nginx config for the IP-based virtual host
-    sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<'EOF'
+sudo tee /etc/nginx/sites-available/$IPADDR > /dev/null <<EOF
 server {
     listen 80;
     listen [::]:80;
 
-    # Root is the new path /var/www/<IP>/nasa
     root $TARGET_DIR;
     index index.html index.htm index.nginx-debian.html;
 
