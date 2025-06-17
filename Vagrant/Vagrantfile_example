@@ -1,0 +1,31 @@
+# Vagrantfile - Method 1: Template File
+site_folder_name = "my_website"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.network "public_network", use_dhcp_assigned_default_route: true
+  config.vm.synced_folder "./shared/", "/shared"
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo apt-get update && sudo apt-get install -y nginx
+
+    IPADDR=$(ip -4 addr show | grep -oP 'inet \\K[\\d.]+' | grep -E '^(192\\.168|10\\.)')
+
+    # Create web directory and copy site content from the shared folder
+    sudo mkdir -p /var/www/$IPADDR/html
+    sudo cp -r /shared/#{site_folder_name}/* /var/www/$IPADDR/html/
+
+    # 1. Copy the template from the shared folder
+    sudo cp /shared/web_config.template /etc/nginx/sites-available/$IPADDR
+
+    # 2. Use 'sed' to replace the placeholder with the actual IP address
+    sudo sed -i "s/!!SERVER_IP!!/${IPADDR}/g" /etc/nginx/sites-available/$IPADDR
+
+    sudo ln -sf /etc/nginx/sites-available/$IPADDR /etc/nginx/sites-enabled/
+    sudo rm -f /etc/nginx/sites-enabled/default
+    sudo systemctl restart nginx
+    if [ -z "$IPADDR" ]; then echo "ERROR: No IP found!"; exit 1; fi
+    echo "VM IP Address is: $IPADDR"
+    echo "Provisioning complete. Visit http://$IPADDR"
+  SHELL
+end
