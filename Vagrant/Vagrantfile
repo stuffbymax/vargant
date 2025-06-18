@@ -64,6 +64,7 @@ EOF
 
     # Print the selected IP address to the console
     echo -e "Your IP is \e[42m $IPADDR \e[0m"
+    echo -e "site \e[33mhttp://$IPADDR\e[0m"
 
     # Restart nginx to apply the new configuration
     sudo systemctl restart nginx
